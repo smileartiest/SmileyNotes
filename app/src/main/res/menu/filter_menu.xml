@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <item android:id="@+id/filter_priority"
-        android:title="Priority"
-        android:icon="@drawable/priority_icon"/>
-    <item android:id="@+id/filter_color"
-        android:title="Color"
-        android:icon="@drawable/color_icon"/>
-    <item
-        android:id="@+id/filter_shorting"
-        android:icon="@drawable/sort_icon"
-        android:title="Shorting"/>
+    <item android:id="@+id/filter_search_menu"
+        android:title="Search..."
+        android:icon="@drawable/search_icon"
+        app:showAsAction="always|collapseActionView"
+        app:actionViewClass="androidx.appcompat.widget.SearchView"/>
 
 </menu>

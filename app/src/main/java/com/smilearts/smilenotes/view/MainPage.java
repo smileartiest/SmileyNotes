@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,6 +16,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.ContextMenu;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,6 +25,8 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.PopupMenu;
 
+import com.google.android.material.bottomappbar.BottomAppBar;
+import com.smilearts.smilenotes.BuildConfig;
 import com.smilearts.smilenotes.R;
 import com.smilearts.smilenotes.adapter.NotesAdapter;
 import com.smilearts.smilenotes.controller.RoomDB;
@@ -34,13 +38,14 @@ import java.util.List;
 
 public class MainPage extends AppCompatActivity {
 
-    Toolbar myToolbar;
+    BottomAppBar myToolbar;
     RecyclerView list;
     List<NotesModel> modelList;
     RoomDB roomDB;
-    AutoCompleteTextView search_bar;
-    ArrayList<String> title_list ;
+    SearchView searchView;
     ConstraintLayout noData;
+    NotesAdapter adapter;
+    int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,142 +64,22 @@ public class MainPage extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.main_add_notes).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getApplicationContext() , AddNotes.class).putExtra("type","new"));
             }
         });
 
-        search_bar.addTextChangedListener(new TextWatcher() {
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
-            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+            public boolean onQueryTextSubmit(String query) {
+                return false;
             }
             @Override
-            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-            }
-            @Override
-            public void afterTextChanged(Editable editable) {
-                modelList = roomDB.notesDao().getNotesByTitle(editable.toString());
-                NotesAdapter adapter = new NotesAdapter(modelList , MainPage.this);
-                list.setAdapter(adapter);
-            }
-        });
-
-        findViewById(R.id.main_filter).setOnClickListener(new View.OnClickListener() {
-            @RequiresApi(api = Build.VERSION_CODES.Q)
-            @Override
-            public void onClick(final View view) {
-                final PopupMenu menu = new PopupMenu(MainPage.this , view);
-                menu.inflate(R.menu.filter_menu);
-                menu.setGravity(Gravity.END);
-                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem menuItem) {
-                        switch (menuItem.getItemId()){
-                            case R.id.filter_priority:
-                                PopupMenu menu1 = new PopupMenu(MainPage.this , view);
-                                menu1.inflate(R.menu.priority_menu);
-                                menu1.setGravity(Gravity.END);
-                                menu1.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                    @Override
-                                    public boolean onMenuItemClick(MenuItem menuItem) {
-                                        switch (menuItem.getItemId()){
-                                            case R.id.menu_priority:
-                                                modelList = roomDB.notesDao().getNotesByPriority(1);
-                                                NotesAdapter adapter = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter);
-                                                return true;
-                                            case R.id.menu_non_priority:
-                                                modelList = roomDB.notesDao().getNotesByPriority(0);
-                                                NotesAdapter adapter1 = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter1);
-                                                return true;
-                                        }
-                                        return false;
-                                    }
-                                });
-                                menu1.show();
-                                return true;
-                            case R.id.filter_color:
-                                PopupMenu menu2 = new PopupMenu(MainPage.this , view);
-                                menu2.inflate(R.menu.color_menu);
-                                menu2.setGravity(Gravity.END);
-                                menu2.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                    @Override
-                                    public boolean onMenuItemClick(MenuItem menuItem) {
-                                        switch (menuItem.getItemId()){
-                                            case R.id.menu_default:
-                                                modelList = roomDB.notesDao().getNotesByColor(ColorUtil.DEFAULT);
-                                                NotesAdapter adapter = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter);
-                                                return true;
-                                            case R.id.menu_lightblue:
-                                                modelList = roomDB.notesDao().getNotesByColor(ColorUtil.LIGHTBLUE);
-                                                NotesAdapter adapter2 = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter2);
-                                                return true;
-                                            case R.id.menu_lightgreen:
-                                                modelList = roomDB.notesDao().getNotesByColor(ColorUtil.LIGHTGREEN);
-                                                NotesAdapter adapter3 = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter3);
-                                                return true;
-                                            case R.id.menu_lighyellow:
-                                                modelList = roomDB.notesDao().getNotesByColor(ColorUtil.LIGHTYELLOW);
-                                                NotesAdapter adapter4 = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter4);
-                                                return true;
-                                            case R.id.menu_darkyellow:
-                                                modelList = roomDB.notesDao().getNotesByColor(ColorUtil.DARKYELLOW);
-                                                NotesAdapter adapter5 = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter5);
-                                                return true;
-                                        }
-                                        return false;
-                                    }
-                                });
-                                menu2.show();
-                                menu2.setOnDismissListener(new PopupMenu.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(PopupMenu popupMenu) {
-                                        popupMenu.dismiss();
-                                    }
-                                });
-                                return true;
-                            case R.id.filter_shorting:
-                                PopupMenu menu3 = new PopupMenu(MainPage.this , view);
-                                menu3.inflate(R.menu.short_menu);
-                                menu3.setGravity(Gravity.END);menu3.show();
-                                menu3.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                    @Override
-                                    public boolean onMenuItemClick(MenuItem menuItem) {
-                                        switch (menuItem.getItemId()){
-                                            case R.id.menu_asc:
-                                                modelList = roomDB.notesDao().getNotesASC();
-                                                NotesAdapter adapter = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter);
-                                                return true;
-                                            case R.id.menu_desc:
-                                                modelList = roomDB.notesDao().getNotesDESC();
-                                                NotesAdapter adapter2 = new NotesAdapter(modelList , MainPage.this);
-                                                list.setAdapter(adapter2);
-                                                return true;
-                                        }
-                                        return false;
-                                    }
-                                });
-                                menu3.setOnDismissListener(new PopupMenu.OnDismissListener() {
-                                    @Override
-                                    public void onDismiss(PopupMenu popupMenu) {
-                                        popupMenu.dismiss();
-                                    }
-                                });
-                                return true;
-                        }
-                        return false;
-                    }
-                });
-                menu.show();
+            public boolean onQueryTextChange(String newText) {
+                adapter.getFilter().filter(newText);
+                return false;
             }
         });
 
@@ -208,11 +93,38 @@ public class MainPage extends AppCompatActivity {
     }
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        getMenuInflater().inflate(R.menu.context_menu , menu);
+        position = v.getId();
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.context_delete:
+                roomDB.notesDao().DeleteNote(modelList.get(position).getId());
+                return true;
+            case R.id.context_share:
+                NotesModel model = roomDB.notesDao().getNote(modelList.get(position).getId());
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "Title : " + model.getTitle() + "\nNotes : " + model.getMessage());
+                sendIntent.setType("text/plain");
+                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                startActivity(shareIntent);
+                return true;
+        }
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu , menu);
         return super.onCreateOptionsMenu(menu);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
         switch (item.getItemId()){
@@ -220,8 +132,10 @@ public class MainPage extends AppCompatActivity {
                 startActivity(new Intent(getApplicationContext() , SettingPage.class));
                 break;
             case R.id.main_refresh:
-                search_bar.setText("");
                 getList();
+                break;
+            case R.id.main_filter:
+                startActivity(new Intent(getApplicationContext() , Filter_Page.class));
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -229,33 +143,25 @@ public class MainPage extends AppCompatActivity {
 
     void getList(){
         modelList = roomDB.notesDao().getNotes();
-        NotesAdapter adapter = new NotesAdapter(modelList , MainPage.this);
+        adapter = new NotesAdapter(modelList , MainPage.this);
         list.setAdapter(adapter);
         if(modelList.size()==0){
             noData.setVisibility(View.VISIBLE);
         }else {
             noData.setVisibility(View.GONE);
         }
-        title_list = new ArrayList<>();
-        for(int i = 0 ; i < modelList.size() ; i++){
-            title_list.add(modelList.get(i).getTitle());
-        }
-        ArrayAdapter<String> ad = new ArrayAdapter(MainPage.this , R.layout.spin_list , title_list);
-        search_bar.setAdapter(ad);
-        search_bar.setThreshold(1);
     }
 
     private void initialise(){
-        myToolbar = findViewById(R.id.main_toolbar);
+        myToolbar = findViewById(R.id.main_appbar);
         setSupportActionBar(myToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        myToolbar.setNavigationIcon(R.drawable.add_icon);
         list = findViewById(R.id.main_recycle);
-        search_bar = findViewById(R.id.main_searchbar);
+        searchView = findViewById(R.id.main_search_view);
         roomDB = RoomDB.getInstance(MainPage.this);
         list.setHasFixedSize(true);
         list.setLayoutManager(new LinearLayoutManager(MainPage.this));
         noData = findViewById(R.id.main_nodata);
+        registerForContextMenu(list);
     }
 
     @Override

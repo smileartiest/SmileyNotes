@@ -14,6 +14,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.CompoundButton;
@@ -22,6 +23,11 @@ import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.tasks.OnCompleteListener;
+import com.google.android.play.core.tasks.Task;
 import com.smilearts.smilenotes.BuildConfig;
 import com.smilearts.smilenotes.R;
 import com.smilearts.smilenotes.controller.FireBaseDB;
@@ -109,7 +115,13 @@ public class SettingPage extends AppCompatActivity {
         findViewById(R.id.settings_backup_notes).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                dialog.show();
+                Snackbar.make(view , "Wait for Next update " , Snackbar.LENGTH_SHORT).show();
+            }
+        });
+
+        findViewById(R.id.settings_restore_notes).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 Snackbar.make(view , "Wait for Next update " , Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -127,9 +139,29 @@ public class SettingPage extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.settings_update_app).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());
+                Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
+                // To count with Play market backstack, After pressing back button,
+                // to taken back to our application, we need to add following flags to intent.
+                goToMarket.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY |
+                        Intent.FLAG_ACTIVITY_NEW_DOCUMENT |
+                        Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
+                try {
+                    startActivity(goToMarket);
+                } catch (ActivityNotFoundException e) {
+                    startActivity(new Intent(Intent.ACTION_VIEW,
+                            Uri.parse("http://play.google.com/store/apps/details?id=" + getApplicationContext().getPackageName())));
+                }
+            }
+        });
+
         findViewById(R.id.settings_rate_app).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //AppRating(view);
                 Uri uri = Uri.parse("market://details?id=" + getApplicationContext().getPackageName());
                 Intent goToMarket = new Intent(Intent.ACTION_VIEW, uri);
                 // To count with Play market backstack, After pressing back button,
@@ -180,6 +212,21 @@ public class SettingPage extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void AppRating(final View view){
+        ReviewManager manager = ReviewManagerFactory.create(SettingPage.this);
+        Task<ReviewInfo> request = manager.requestReviewFlow();
+        request.addOnCompleteListener(new OnCompleteListener<ReviewInfo>() {
+            @Override
+            public void onComplete(Task<ReviewInfo> task) {
+                if(task.isSuccessful()){
+                    ReviewInfo info = task.getResult();
+                    Snackbar.make(view , "Thank you for review "+info.toString() , Snackbar.LENGTH_SHORT).show();
+                }else {
+                    Log.d("Setting Page" , task.toString());}
+            }
+        });
     }
 
     private void openPasswordDialog() {

@@ -21,6 +21,14 @@ public class TempData {
         editor.commit();
     }
 
+    public void LastBackupName(String s){
+        editor.putString("BACKUPNAME" , s).commit();
+    }
+
+    public String getLastBackUpName(){
+        return sharedPreferences.getString("BACKUPNAME" , null);
+    }
+
     public void LastBackup(String date){
         editor.putString("BCDATE" , date).commit();
     }

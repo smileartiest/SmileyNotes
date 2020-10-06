@@ -3,10 +3,7 @@ package com.smilearts.smilenotes.dao;
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
-import androidx.room.Update;
 import com.smilearts.smilenotes.model.NotesModel;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Dao
@@ -15,7 +12,7 @@ public interface NotesDao {
     @Insert
     void Insert(NotesModel model);
 
-    @Query("SELECT * FROM Notes ORDER BY Priority DESC")
+    @Query("SELECT * FROM Notes")
     List<NotesModel> getNotes();
 
     @Query("SELECT * FROM Notes ORDER BY Title DESC")
@@ -38,6 +35,9 @@ public interface NotesDao {
 
     @Query("UPDATE Notes SET Title =:title , Message =:message , Time =:time , Date =:date , Bg =:bg , Priority =:pri WHERE Id =:id")
     void Update(int id , String title , String message , String time , String date , String bg , int pri);
+
+    @Query("UPDATE Notes SET Priority =:pri WHERE Id =:id")
+    void UpdatePriority(int id , int pri);
 
     @Query("DELETE FROM Notes WHERE Id=:Id")
     void DeleteNote(int Id);

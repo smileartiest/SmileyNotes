@@ -43,7 +43,7 @@
             android:layout_width="0dp"
             android:layout_height="40dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:background="@drawable/button_line_black"
             android:fontFamily="serif"
@@ -122,16 +122,32 @@
                 android:layout_width="0dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
                 android:layout_marginEnd="16dp"
-                android:layout_marginBottom="16dp"
                 android:background="@drawable/button_line_black"
                 android:fontFamily="serif"
                 android:text="Change Password"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="@color/colorBlack"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settings_passwordswitch" />
+
+            <TextView
+                android:id="@+id/textView4"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="16dp"
+                android:fontFamily="serif"
+                android:text="If you forget your pin lost your all data."
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 app:layout_constraintBottom_toTopOf="@+id/view4"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settings_changepassword" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
@@ -141,7 +157,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:fontFamily="serif"
-            android:text="Data's"
+            android:text="Data"
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             android:textColor="@color/colorPrimary"
             android:textStyle="bold"
@@ -162,7 +178,7 @@
             android:textColor="@color/colorDarkGray"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView6" />
+            app:layout_constraintTop_toBottomOf="@+id/settings_restore_notes" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="0dp"
@@ -193,14 +209,14 @@
                 android:layout_marginTop="8dp"
                 android:layout_marginEnd="16dp"
                 android:fontFamily="serif"
-                android:text="Rate this app &amp; Feedback"
                 android:paddingTop="5dp"
                 android:paddingBottom="5dp"
+                android:text="Rate this app &amp; Feedback"
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="@color/colorBlue"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settings_share_app" />
+                app:layout_constraintTop_toBottomOf="@+id/settings_update_app" />
 
             <TextView
                 android:id="@+id/settings_about_app"
@@ -255,6 +271,23 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView16" />
+
+            <TextView
+                android:id="@+id/settings_update_app"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="serif"
+                android:paddingTop="5dp"
+                android:paddingBottom="5dp"
+                android:text="Check for Update"
+                android:textAppearance="@style/TextAppearance.AppCompat.Small"
+                android:textColor="@color/colorBlue"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/settings_share_app" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
@@ -265,11 +298,27 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:fontFamily="serif"
-            android:text="Delete your all data's permenetntly."
+            android:text="Delete your all data's permanently."
             android:textAppearance="@style/TextAppearance.AppCompat.Small"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/settings_clear_all_notes" />
+
+        <Button
+            android:id="@+id/settings_restore_notes"
+            android:layout_width="0dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="16dp"
+            android:background="@drawable/button_line_gray"
+            android:fontFamily="serif"
+            android:text="Restore"
+            android:textAppearance="@style/TextAppearance.AppCompat.Small"
+            android:textColor="@color/colorDarkGray"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

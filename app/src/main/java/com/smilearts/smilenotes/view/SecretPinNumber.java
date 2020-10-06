@@ -1,8 +1,8 @@
 package com.smilearts.smilenotes.view;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-
+import android.app.KeyguardManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
@@ -11,15 +11,9 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
 import com.smilearts.smilenotes.R;
-import com.smilearts.smilenotes.controller.FireBaseDB;
 import com.smilearts.smilenotes.controller.TempData;
-
 import dmax.dialog.SpotsDialog;
 
 public class SecretPinNumber extends AppCompatActivity {
@@ -29,6 +23,7 @@ public class SecretPinNumber extends AppCompatActivity {
     TempData tempData;
     int count = 0;
     SpotsDialog loading;
+    private static int CODE_AUTHENTICATION_VERIFICATION=241;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +35,18 @@ public class SecretPinNumber extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+
+        findViewById(R.id.pin_mobilepin).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                KeyguardManager km = (KeyguardManager)getSystemService(KEYGUARD_SERVICE);
+                if(km.isKeyguardSecure()) {
+                    Intent i = km.createConfirmDeviceCredentialIntent("Authentication required", "password");
+                    startActivityForResult(i, CODE_AUTHENTICATION_VERIFICATION);
+                } else
+                    Toast.makeText(SecretPinNumber.this, "No any security setup done by user(pattern or password or pin or fingerprint", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         findViewById(R.id.pin_continue).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,6 +157,18 @@ public class SecretPinNumber extends AppCompatActivity {
                 }
             }
         });
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(resultCode==RESULT_OK && requestCode==CODE_AUTHENTICATION_VERIFICATION)
+        {
+            Toast.makeText(this, "Success: Verified user's identity", Toast.LENGTH_SHORT).show();
+            startActivity(new Intent(getApplicationContext() , MainPage.class));finish();
+        } else
+            Toast.makeText(this, "Failure: Unable to verify user's identity", Toast.LENGTH_SHORT).show();
 
     }
 

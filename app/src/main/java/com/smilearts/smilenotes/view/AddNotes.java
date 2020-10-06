@@ -102,6 +102,7 @@ public class AddNotes extends AppCompatActivity {
                 if (getIntent().getStringExtra("type").equals("update")) {
                     roomDB.notesDao().Update(getIntent().getIntExtra("id", 0), txt_title.getText().toString(), txt_message.getText().toString(), timeDate.getTime(), timeDate.getDateYMD() , BG_COLOR , priority);
                     Snackbar.make(v, "Update Successful", Snackbar.LENGTH_SHORT).show();
+                    finish();
                 } else {
                     model = new NotesModel();
                     model.setTitle(txt_title.getText().toString());
@@ -112,6 +113,7 @@ public class AddNotes extends AppCompatActivity {
                     model.setPriority(priority);
                     roomDB.notesDao().Insert(model);
                     Snackbar.make(v, "Save Successful", Snackbar.LENGTH_SHORT).show();
+                    finish();
                 }
             }
         });

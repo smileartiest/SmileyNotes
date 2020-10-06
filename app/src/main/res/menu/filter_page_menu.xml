@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn="navigation_view">
+
+    <group android:id="@+id/group1"
+        android:checkableBehavior="single">
+
+        <item
+            android:fontFamily="serif"
+            android:title="Priority">
+            <menu>
+                <item
+                    android:id="@+id/menu_priority"
+                    android:title="Priority"
+                    android:fontFamily="serif"
+                    android:icon="@drawable/priority_icon"/>
+                <item
+                    android:id="@+id/menu_non_priority"
+                    android:title="Non Priority"
+                    android:fontFamily="serif"
+                    android:icon="@drawable/non_priority_icon"/>
+            </menu>
+        </item>
+    </group>
+
+    <group android:id="@+id/group2"
+        android:checkableBehavior="single">
+
+        <item android:title="Color">
+            <menu>
+                <item android:id="@+id/menu_default"
+                    android:icon="@drawable/default_round"
+                    android:fontFamily="serif"
+                    android:title="Default"/>
+                <item android:id="@+id/menu_lightblue"
+                    android:icon="@drawable/lightblue_round"
+                    android:fontFamily="serif"
+                    android:title="Blue"/>
+                <item android:id="@+id/menu_lightgreen"
+                    android:icon="@drawable/lightgreen_round"
+                    android:fontFamily="serif"
+                    android:title="Green"/>
+                <item android:id="@+id/menu_lighyellow"
+                    android:icon="@drawable/lightyellow_round"
+                    android:fontFamily="serif"
+                    android:title="Yellow"/>
+                <item android:id="@+id/menu_darkyellow"
+                    android:icon="@drawable/darkyellow_round"
+                    android:fontFamily="serif"
+                    android:title="Dark Yellow"/>
+            </menu>
+        </item>
+    </group>
+
+    <group android:id="@+id/group3"
+        android:checkableBehavior="single">
+
+        <item android:title="Shorting">
+            <menu>
+                <item android:id="@+id/menu_asc"
+                    android:icon="@drawable/asc_icon"
+                    android:fontFamily="serif"
+                    android:title="Ascending"/>
+                <item android:id="@+id/menu_desc"
+                    android:icon="@drawable/desc_icon"
+                    android:fontFamily="serif"
+                    android:title="Descending"/>
+            </menu>
+        </item>
+
+    </group>
+
+</menu>

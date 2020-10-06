@@ -9,8 +9,8 @@ android {
         applicationId "com.smilearts.smilenotes"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 4
-        versionName "1.0.3"
+        versionCode 6
+        versionName "1.1.0.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -32,6 +32,7 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.1'
     implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.2.1'
+    implementation 'com.google.android.material:material:1.2.1-alpha02'
 
     //lotti animation
     implementation 'com.airbnb.android:lottie:3.4.2'
@@ -46,6 +47,9 @@ dependencies {
 
     //Loading dialog
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
+
+    //Review Library
+    implementation 'com.google.android.play:core:1.8.2'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'

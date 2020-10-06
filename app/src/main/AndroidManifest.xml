@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.smilearts.smilenotes">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,10 +13,12 @@
         android:roundIcon="@mipmap/app_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.SettingPage"/>
+        <activity android:name=".view.Filter_Page" android:label=""/>
+        <activity android:name=".view.SettingPage" />
         <activity android:name=".view.AddNotes" />
-        <activity android:name=".view.MainPage"
-            android:label=""/>
+        <activity
+            android:name=".view.MainPage"
+            android:theme="@style/AppbarTheme"/>
         <activity android:name=".view.SecretPinNumber" />
         <activity android:name=".view.SplaseScreen">
             <intent-filter>
@@ -26,21 +28,20 @@
             </intent-filter>
         </activity>
 
-        <service android:name=".notification.FireBaseMessage"
+        <service
+            android:name=".notification.FireBaseMessage"
             android:exported="false">
             <intent-filter>
-                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
             </intent-filter>
         </service>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_icon"
-            android:resource="@drawable/notes_icon_notification"/>
-
+            android:resource="@drawable/notes_icon_notification" />
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_color"
-            android:resource="@color/colorDarkGray"/>
-
+            android:resource="@color/colorDarkGray" />
     </application>
 
 </manifest>
