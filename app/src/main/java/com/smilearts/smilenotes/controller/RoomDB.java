@@ -6,8 +6,9 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import com.smilearts.smilenotes.dao.NotesDao;
 import com.smilearts.smilenotes.model.NotesModel;
+import com.smilearts.smilenotes.model.RecycleModel;
 
-@Database(entities = {NotesModel.class} , version = 2, exportSchema = true)
+@Database(entities = {NotesModel.class , RecycleModel.class} , version = 3)
 public abstract class RoomDB extends RoomDatabase {
 
     public static String DB_NAME = "NOTES_DB";

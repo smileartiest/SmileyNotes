@@ -1,10 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <item
+        android:id="@+id/context_priority"
+        android:title="Set Priority"/>
+
+    <item
+        android:id="@+id/context_recycleBin"
+        android:title="Move to Recycle Bin"/>
+
     <item android:id="@+id/context_delete"
-        android:title="Delete"/>
+        android:title="Delete Permanent"/>
+
     <item
         android:id="@+id/context_share"
-        android:title="Share"/>
+        android:title="Share This Notes"/>
+
 
 </menu>

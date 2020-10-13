@@ -5,35 +5,26 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.ContextMenu;
-import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.PopupMenu;
 
 import com.google.android.material.bottomappbar.BottomAppBar;
-import com.smilearts.smilenotes.BuildConfig;
 import com.smilearts.smilenotes.R;
 import com.smilearts.smilenotes.adapter.NotesAdapter;
 import com.smilearts.smilenotes.controller.RoomDB;
-import com.smilearts.smilenotes.model.ColorUtil;
 import com.smilearts.smilenotes.model.NotesModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class MainPage extends AppCompatActivity {
@@ -45,7 +36,6 @@ public class MainPage extends AppCompatActivity {
     SearchView searchView;
     ConstraintLayout noData;
     NotesAdapter adapter;
-    int position = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,38 +80,39 @@ public class MainPage extends AppCompatActivity {
             }
         });
 
-    }
+        myToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(getApplicationContext() , RecycleBin.class));
+            }
+        });
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        getMenuInflater().inflate(R.menu.context_menu , menu);
-        position = v.getId();
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
-
-    @Override
-    public boolean onContextItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.context_delete:
-                roomDB.notesDao().DeleteNote(modelList.get(position).getId());
-                return true;
-            case R.id.context_share:
-                NotesModel model = roomDB.notesDao().getNote(modelList.get(position).getId());
-                Intent sendIntent = new Intent();
-                sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "Title : " + model.getTitle() + "\nNotes : " + model.getMessage());
-                sendIntent.setType("text/plain");
-                Intent shareIntent = Intent.createChooser(sendIntent, null);
-                startActivity(shareIntent);
-                return true;
-        }
-        return super.onContextItemSelected(item);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main_menu , menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        getMenuInflater().inflate(R.menu.context_menu , menu);
+        menu.setHeaderTitle("Select Action");
+    }
+
+    @Override
+    public boolean onContextItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.context_delete:
+                roomDB.notesDao().DeleteNote(modelList.get(adapter.getPosition()).getId());
+                adapter.notifyDataSetChanged();
+                return true;
+            case R.id.context_share:
+                return true;
+        }
+        return super.onContextItemSelected(item);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -155,6 +146,7 @@ public class MainPage extends AppCompatActivity {
     private void initialise(){
         myToolbar = findViewById(R.id.main_appbar);
         setSupportActionBar(myToolbar);
+        myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorPrimary) , PorterDuff.Mode.SRC_ATOP);
         list = findViewById(R.id.main_recycle);
         searchView = findViewById(R.id.main_search_view);
         roomDB = RoomDB.getInstance(MainPage.this);

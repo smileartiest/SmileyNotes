@@ -4,6 +4,8 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 import com.smilearts.smilenotes.model.NotesModel;
+import com.smilearts.smilenotes.model.RecycleModel;
+
 import java.util.List;
 
 @Dao
@@ -11,6 +13,15 @@ public interface NotesDao {
 
     @Insert
     void Insert(NotesModel model);
+
+    @Insert
+    void InsertRecycle(RecycleModel model);
+
+    @Query("SELECT * FROM Recycle")
+    List<RecycleModel> getRecycleList();
+
+    @Query("DELETE FROM Recycle WHERE Id =:id")
+    void DeleteRecycle(int id);
 
     @Query("SELECT * FROM Notes")
     List<NotesModel> getNotes();

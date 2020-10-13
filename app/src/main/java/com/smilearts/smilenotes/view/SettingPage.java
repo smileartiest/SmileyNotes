@@ -1,9 +1,10 @@
 package com.smilearts.smilenotes.view;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-
 import android.app.Dialog;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
@@ -17,25 +18,34 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.TextInputLayout;
-import com.google.android.play.core.review.ReviewInfo;
-import com.google.android.play.core.review.ReviewManager;
-import com.google.android.play.core.review.ReviewManagerFactory;
-import com.google.android.play.core.tasks.OnCompleteListener;
-import com.google.android.play.core.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 import com.smilearts.smilenotes.BuildConfig;
 import com.smilearts.smilenotes.R;
-import com.smilearts.smilenotes.controller.FireBaseDB;
 import com.smilearts.smilenotes.controller.RoomDB;
 import com.smilearts.smilenotes.controller.TempData;
-
 import java.io.File;
 
+import de.hdodenhof.circleimageview.CircleImageView;
 import dmax.dialog.SpotsDialog;
 
 public class SettingPage extends AppCompatActivity {
@@ -43,10 +53,17 @@ public class SettingPage extends AppCompatActivity {
     Toolbar myToolbar;
     TempData tempData;
     Switch password_switch;
-    TextView complete;
+    TextView signIn , complete , user_name , user_email;
+    CircleImageView profile_pic;
+    Button  backUp , restore;
     Dialog d;
     RoomDB roomDB;
     SpotsDialog dialog;
+    private static final int RC_SIGN_IN = 9001;
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient mGoogleSignInClient;
+    SpotsDialog loading;
+    boolean login_sts = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,11 +71,20 @@ public class SettingPage extends AppCompatActivity {
         setContentView(R.layout.setting_page);
         initialise();
         CreateFolder();
+        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
+        mAuth = FirebaseAuth.getInstance();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        updateUI(currentUser);
 
         if (tempData.getPinStatus()) {
             password_switch.setChecked(true);
@@ -115,14 +141,18 @@ public class SettingPage extends AppCompatActivity {
         findViewById(R.id.settings_backup_notes).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view , "Wait for Next update " , Snackbar.LENGTH_SHORT).show();
+                if(login_sts){
+                    Snackbar.make(view , "Wait for Next update " , Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 
         findViewById(R.id.settings_restore_notes).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view , "Wait for Next update " , Snackbar.LENGTH_SHORT).show();
+                if(login_sts){
+                    Snackbar.make(view , "Wait for Next update " , Snackbar.LENGTH_SHORT).show();
+                }
             }
         });
 
@@ -199,6 +229,97 @@ public class SettingPage extends AppCompatActivity {
             }
         });
 
+        signIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(signIn.getText().toString().equals("Logout")){
+                    loading.show();
+                    mAuth.signOut();
+                    mGoogleSignInClient.signOut().addOnCompleteListener(SettingPage.this,
+                            new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    loading.dismiss();
+                                    updateUI(null);
+                                }
+                            });
+                }else {
+                    loading.show();
+                    Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+                    startActivityForResult(signInIntent, RC_SIGN_IN);
+                }
+            }
+        });
+
+    }
+
+    private void updateUI(FirebaseUser user) {
+        if (user != null) {
+            profile_pic.setVisibility(View.VISIBLE);
+            Glide.with(SettingPage.this).load(user.getPhotoUrl()).into(profile_pic);
+            user_name.setText(user.getDisplayName());
+            user_email.setText(user.getEmail());
+            user_email.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.green_tike , 0);
+            signIn.setText("Logout");
+            backUp.setBackgroundResource(R.drawable.button_green_line);
+            backUp.setTextColor(getResources().getColor(R.color.colorGreen));
+            restore.setBackgroundResource(R.drawable.button_green_line);
+            restore.setTextColor(getResources().getColor(R.color.colorGreen));
+            login_sts = true ;
+        } else {
+            profile_pic.setVisibility(View.GONE);
+            signIn.setText("Sign In");
+            user_name.setText("");
+            user_email.setText("Please sign In");
+            user_email.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,0 , 0);
+            backUp.setBackgroundResource(R.drawable.button_line_gray);
+            backUp.setTextColor(getResources().getColor(R.color.colorDarkGray));
+            restore.setBackgroundResource(R.drawable.button_line_gray);
+            restore.setTextColor(getResources().getColor(R.color.colorDarkGray));
+            login_sts = false;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == RC_SIGN_IN){
+            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+            try {
+                GoogleSignInAccount account = task.getResult(ApiException.class);
+                Log.d("Account ID  : " , account.getId());
+                firebaseAuthWithGoogle(account.getIdToken());
+            } catch (ApiException e) {
+                loading.dismiss();
+                e.printStackTrace();
+                Log.d("Sign In Faild : " , e.getMessage());
+                updateUI(null);
+            }
+        }else {
+            loading.dismiss();
+            Toast.makeText(this, "try again", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void firebaseAuthWithGoogle(String idToken) {
+        AuthCredential credential = GoogleAuthProvider.getCredential(idToken, null);
+        mAuth.signInWithCredential(credential)
+                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task) {
+                        if (task.isSuccessful()) {
+                            Log.d("Sign In ", "signInWithCredential:success");
+                            loading.dismiss();
+                            FirebaseUser user = mAuth.getCurrentUser();
+                            updateUI(user);
+                        } else {
+                            loading.dismiss();
+                            Log.w("Sign In ", "signInWithCredential:failure", task.getException());
+                            Toast.makeText(SettingPage.this, "Authentication Failed.", Toast.LENGTH_SHORT).show();
+                            updateUI(null);
+                        }
+                    }
+                });
     }
 
     private void CreateFolder(){
@@ -212,21 +333,6 @@ public class SettingPage extends AppCompatActivity {
         catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void AppRating(final View view){
-        ReviewManager manager = ReviewManagerFactory.create(SettingPage.this);
-        Task<ReviewInfo> request = manager.requestReviewFlow();
-        request.addOnCompleteListener(new OnCompleteListener<ReviewInfo>() {
-            @Override
-            public void onComplete(Task<ReviewInfo> task) {
-                if(task.isSuccessful()){
-                    ReviewInfo info = task.getResult();
-                    Snackbar.make(view , "Thank you for review "+info.toString() , Snackbar.LENGTH_SHORT).show();
-                }else {
-                    Log.d("Setting Page" , task.toString());}
-            }
-        });
     }
 
     private void openPasswordDialog() {
@@ -276,9 +382,16 @@ public class SettingPage extends AppCompatActivity {
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
         tempData = new TempData(SettingPage.this);
         password_switch = findViewById(R.id.settings_passwordswitch);
+        user_name = findViewById(R.id.settings_user_name);
+        user_email = findViewById(R.id.settings_user_email);
+        signIn = findViewById(R.id.settings_signin);
+        backUp = findViewById(R.id.settings_backup_notes);
+        restore = findViewById(R.id.settings_restore_notes);
+        profile_pic = findViewById(R.id.settings_user_profile_pic);
         roomDB = RoomDB.getInstance(SettingPage.this);
         d = new Dialog(SettingPage.this);
         dialog = new SpotsDialog(SettingPage.this);
+        loading = new SpotsDialog(SettingPage.this);
     }
 
     @Override

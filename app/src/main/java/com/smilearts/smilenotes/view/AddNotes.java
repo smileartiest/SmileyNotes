@@ -27,6 +27,7 @@ import com.smilearts.smilenotes.controller.RoomDB;
 import com.smilearts.smilenotes.controller.TimeDate;
 import com.smilearts.smilenotes.model.ColorUtil;
 import com.smilearts.smilenotes.model.NotesModel;
+import com.smilearts.smilenotes.model.RecycleModel;
 
 public class AddNotes extends AppCompatActivity {
 
@@ -144,7 +145,7 @@ public class AddNotes extends AppCompatActivity {
             public void onClick(View view) {
                 Intent sendIntent = new Intent();
                 sendIntent.setAction(Intent.ACTION_SEND);
-                sendIntent.putExtra(Intent.EXTRA_TEXT, "Title : " + txt_title.getText().toString() + "\nNotes : " + txt_message.getText().toString());
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "Title : " + txt_title.getText().toString() + "\nNotes : \n" + txt_message.getText().toString());
                 sendIntent.setType("text/plain");
                 Intent shareIntent = Intent.createChooser(sendIntent, null);
                 startActivity(shareIntent);
@@ -231,6 +232,16 @@ public class AddNotes extends AppCompatActivity {
                 Toast.makeText(this, "Delete successful", Toast.LENGTH_SHORT).show();
                 finish();
                 break;
+            case R.id.menu_move_bin:
+                RecycleModel model1 = new RecycleModel();
+                model1.setTitle(model.getTitle());
+                model1.setMessage(model.getMessage());
+                model1.setDate(new TimeDate().getDateYMD());
+                roomDB.notesDao().InsertRecycle(model1);
+                roomDB.notesDao().DeleteNote(model.getId());
+                Toast.makeText(this, "Move to Recycle Bin", Toast.LENGTH_SHORT).show();
+                finish();
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -244,6 +255,7 @@ public class AddNotes extends AppCompatActivity {
         setSupportActionBar(myToolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         myToolbar.getNavigationIcon().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
+        myToolbar.getOverflowIcon().setColorFilter(getResources().getColor(R.color.colorPrimary), PorterDuff.Mode.SRC_ATOP);
         title = findViewById(R.id.addnote_title);
         txt_title = findViewById(R.id.addnote_txt_title);
         txt_message = findViewById(R.id.addnote_txt_message);

@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 apply plugin: 'com.google.gms.google-services'
 
 android {
@@ -9,8 +10,8 @@ android {
         applicationId "com.smilearts.smilenotes"
         minSdkVersion 21
         targetSdkVersion 29
-        versionCode 6
-        versionName "1.1.0.2"
+        versionCode 7
+        versionName "1.1.0.3"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -39,20 +40,36 @@ dependencies {
 
     //Room database
     implementation "androidx.room:room-runtime:$room_version"
+    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    //Firebase
     implementation 'com.google.firebase:firebase-database:19.4.0'
     implementation 'com.google.firebase:firebase-storage:19.2.0'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     implementation 'com.google.firebase:firebase-messaging:20.2.4'
-    annotationProcessor "androidx.room:room-compiler:$room_version"
+
+    //Google Sign In
+    implementation platform('com.google.firebase:firebase-bom:25.12.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'com.google.android.gms:play-services-auth:18.1.0'
 
     //Loading dialog
     implementation 'com.github.d-max:spots-dialog:0.7@aar'
 
-    //Review Library
-    implementation 'com.google.android.play:core:1.8.2'
+    //Circle Image View
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //Load Image
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
 
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    implementation "androidx.core:core-ktx:+"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 
+}
+
+repositories {
+    mavenCentral()
 }

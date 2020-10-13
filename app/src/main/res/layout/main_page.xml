@@ -101,9 +101,11 @@
         android:layout_width="match_parent"
         android:layout_gravity="bottom"
         app:fabAlignmentMode="end"
-        app:fabCradleMargin="5dp"
+        app:fabCradleMargin="10dp"
         app:hideOnScroll="true"
+        app:navigationIcon="@drawable/trash_icon"
         app:fabCradleRoundedCornerRadius="20dp"
+        android:background="@drawable/button_red_line"
         app:backgroundTint="@color/colorWhite"
         app:menu="@menu/main_menu"/>
 
@@ -111,11 +113,11 @@
         android:id="@+id/main_add_notes"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/add_icon"
+        android:src="@drawable/add_notes_icon"
         app:tint="@color/colorPrimaryDark"
         app:elevation="3dp"
         app:backgroundTint="@color/colorWhite"
         app:layout_anchor="@id/main_appbar"
-        app:maxImageSize="35dp" />
+        app:maxImageSize="24dp" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

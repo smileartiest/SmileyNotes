@@ -2,20 +2,30 @@ package com.smilearts.smilenotes.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.snackbar.Snackbar;
 import com.smilearts.smilenotes.R;
 import com.smilearts.smilenotes.controller.RoomDB;
+import com.smilearts.smilenotes.controller.TimeDate;
 import com.smilearts.smilenotes.model.ColorUtil;
 import com.smilearts.smilenotes.model.NotesModel;
+import com.smilearts.smilenotes.model.RecycleModel;
 import com.smilearts.smilenotes.view.AddNotes;
 
 import java.util.ArrayList;
@@ -28,6 +38,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     List<NotesModel> listAll;
     Context mContext;
     RoomDB roomDB;
+    int position;
 
     public NotesAdapter(List<NotesModel> list, Context mContext) {
         this.list = list;
@@ -44,7 +55,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final MyViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final MyViewHolder holder, final int position) {
         final NotesModel model = list.get(position);
         holder.title.setText(model.getTitle());
         holder.message.setText(model.getMessage());
@@ -75,6 +86,14 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
             }
         });
 
+        holder.card.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                setPosition(holder.getPosition());
+                return true;
+            }
+        });
+
         holder.priority.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -88,11 +107,67 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
             }
         });
 
+        holder.more.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(final View v) {
+                final PopupMenu menu = new PopupMenu(mContext ,v);
+                menu.inflate(R.menu.context_menu);
+                menu.show();
+                menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.context_delete:
+                                roomDB.notesDao().DeleteNote(model.getId());
+                                list.remove(position);
+                                notifyDataSetChanged();
+                                menu.dismiss();
+                                Snackbar.make(v , "Permanently Deleted" , Snackbar.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.context_share:
+                                Intent sendIntent = new Intent();
+                                sendIntent.setAction(Intent.ACTION_SEND);
+                                sendIntent.putExtra(Intent.EXTRA_TEXT, "Title : " + model.getTitle() + "\nNotes : \n" + model.getMessage());
+                                sendIntent.setType("text/plain");
+                                Intent shareIntent = Intent.createChooser(sendIntent, null);
+                                mContext.startActivity(shareIntent);
+                                menu.dismiss();
+                                return true;
+                            case R.id.context_recycleBin:
+                                RecycleModel model1 = new RecycleModel();
+                                model1.setTitle(model.getTitle());
+                                model1.setMessage(model.getMessage());
+                                model1.setDate(new TimeDate().getDateYMD());
+                                roomDB.notesDao().InsertRecycle(model1);
+                                roomDB.notesDao().DeleteNote(model.getId());
+                                list.remove(position);
+                                notifyDataSetChanged();
+                                Snackbar.make(v , "Move to Recycle Bin" , Snackbar.LENGTH_SHORT).show();
+                                return true;
+                            case R.id.context_priority:
+                                roomDB.notesDao().UpdatePriority(model.getId() , 1);
+                                Snackbar.make(v , "Set Priority" , Snackbar.LENGTH_SHORT).show();
+                                return true;
+                        }
+                        return false;
+                    }
+                });
+            }
+        });
+
     }
 
     @Override
     public int getItemCount() {
         return list.size();
+    }
+
+    public int getPosition(){
+        return position;
+    }
+
+    public void setPosition(int position){
+        this.position = position;
     }
 
     @Override
@@ -125,9 +200,9 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
         }
     };
 
-    public class MyViewHolder extends RecyclerView.ViewHolder{
+    public class MyViewHolder extends RecyclerView.ViewHolder {
         TextView title , message , date ;
-        ImageView priority ;
+        ImageView priority , more ;
         ConstraintLayout card;
         public MyViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -136,6 +211,7 @@ public class NotesAdapter extends RecyclerView.Adapter<NotesAdapter.MyViewHolder
             date = itemView.findViewById(R.id.row_notes_date);
             card = itemView.findViewById(R.id.row_notes_card);
             priority = itemView.findViewById(R.id.row_notes_priority);
+            more = itemView.findViewById(R.id.row_notes_moreicon);
         }
     }
 

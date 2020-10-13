@@ -13,14 +13,17 @@
         android:roundIcon="@mipmap/app_logo_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".view.Filter_Page" android:label=""/>
+        <activity android:name=".view.RecycleBin" />
+        <activity
+            android:name=".view.Filter_Page"
+            android:label="" />
         <activity android:name=".view.SettingPage" />
         <activity android:name=".view.AddNotes" />
         <activity
             android:name=".view.MainPage"
-            android:theme="@style/AppbarTheme"/>
+            android:theme="@style/AppbarTheme" />
         <activity android:name=".view.SecretPinNumber" />
-        <activity android:name=".view.SplaseScreen">
+        <activity android:name=".view.SplashScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
